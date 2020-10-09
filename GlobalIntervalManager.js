@@ -4,6 +4,7 @@ const {GlobalInterval} = require('./GlobalInterval')
   constructor () {
     this.list = {} // {id:Interval}
     this.intervalNames = {} // {name:id}
+    console.log = function(){} // disable logs
   }
 
   add (name, intervalMs, callback) {
