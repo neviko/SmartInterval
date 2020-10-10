@@ -8,12 +8,14 @@ class GlobalInterval {
     this.intervalValueMs = 250
     this.consumersList = {}
     this.onIntervalDeleted = options.onIntervalDeleted || function(){}
+    console.log = function(){} // disable logs
+
   }
 
   startInterval (msInterval) {
     this.intervalRef = setInterval(() => {
       Object.values(this.consumersList).forEach(consumer => {
-        if ((this.ticksCounter - consumer.startTime) % consumer.counterModuluToFireCb === 0) {
+        if ((this.ticksCounter - consumer.startTime) % consumer.counterModuloToFireCb === 0) {
           consumer.callback()
         }
       })
@@ -42,10 +44,10 @@ class GlobalInterval {
       startTime: this.ticksCounter,
       interval: interval,
       callback: cb,
-      counterModuluToFireCb: null
+      counterModuloToFireCb: null
     }
     this.updateSmallestIntervalValue()
-    this.updateAllCounterModulu()
+    this.updateAllCounterModulo()
   }
 
   removeConsumer (consumerName) {
@@ -57,7 +59,7 @@ class GlobalInterval {
       return
     }
     this.updateSmallestIntervalValue()
-    this.updateAllCounterModulu()
+    this.updateAllCounterModulo()
   }
 
   updateSmallestIntervalValue () {
@@ -73,13 +75,12 @@ class GlobalInterval {
     if (smallestValue !== this.intervalValueMs) {
       this.intervalValueMs = smallestValue
       this.resetInterval(this.intervalValueMs)
-      // update all intervals callbacks
     }
   }
 
-  updateAllCounterModulu () {
+  updateAllCounterModulo () {
     Object.values(this.consumersList).forEach(item => {
-      item.counterModuluToFireCb = Math.floor(item.interval / this.intervalValueMs)
+      item.counterModuloToFireCb = Math.floor(item.interval / this.intervalValueMs)
     })
   }
 }

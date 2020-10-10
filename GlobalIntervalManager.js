@@ -4,6 +4,7 @@ const {GlobalInterval} = require('./GlobalInterval')
   constructor () {
     this.list = {} // {id:Interval}
     this.intervalNames = {} // {name:id}
+    console.log = function(){} // disable logs
   }
 
   add (name, intervalMs, callback) {
@@ -12,13 +13,13 @@ const {GlobalInterval} = require('./GlobalInterval')
       return null
     }
     const that = this
-    if (!this.isUniqueName(name)) {
+    if (!this._isUniqueName(name)) {
       console.error(`interval ${name} already exist`)
       return null
     }
     for (const interval of Object.values(this.list)) {
-      if (that.isDeviateWithoutRest(interval.intervalValueMs, intervalMs)) {
-        this.addConsumerToExistInterval(interval.id, name, intervalMs, callback)
+      if (that._isDeviateWithoutRest(interval.intervalValueMs, intervalMs)) {
+        this._addConsumerToExistInterval(interval.id, name, intervalMs, callback)
         console.log(`consumer ${name} added to: ${interval.id}` )
         return name
       }
@@ -26,11 +27,11 @@ const {GlobalInterval} = require('./GlobalInterval')
 
     // if we have got here - we can't find a deviation without
     // a rest so we should create a new interval
-    this.createNewInterval(name, intervalMs, callback)
+    this._createNewInterval(name, intervalMs, callback)
     return name
   }
 
-  addConsumerToExistInterval (id, name, intervalMs, callback) {
+  _addConsumerToExistInterval (id, name, intervalMs, callback) {
     this.intervalNames[name] = id
     this.list[id].addConsumer(name, intervalMs, callback)
   }
@@ -47,11 +48,11 @@ const {GlobalInterval} = require('./GlobalInterval')
     return name
   }
 
-  isUniqueName (name) {
+  _isUniqueName (name) {
     return !this.intervalNames[name]
   }
 
-  isDeviateWithoutRest (a, b) {
+  _isDeviateWithoutRest (a, b) {
     if (a >= b) {
       return Number.isInteger(a / b)
     } else {
@@ -59,7 +60,7 @@ const {GlobalInterval} = require('./GlobalInterval')
     }
   }
 
-  createNewInterval (name, intervalMs, callback) {
+  _createNewInterval (name, intervalMs, callback) {
     const interval = new GlobalInterval({
       onIntervalDeleted: id=> {
         delete this.list[id]
@@ -76,10 +77,10 @@ const {GlobalInterval} = require('./GlobalInterval')
     Object.values(this.list).forEach(interval => {
       interval.stopInterval()
     })
-    this.reset()
+    this._reset()
   }
 
-  reset () {
+  _reset () {
     this.list = {}
     this.intervalNames = {}
   }
